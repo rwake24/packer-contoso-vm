@@ -46,6 +46,10 @@ source "vmware-iso" "windows" {
   disk_size        = 61440            # 60 GB
   disk_type_id     = "0"              # Growable virtual disk
 
+  # UEFI firmware (required for Win11)
+  firmware         = "efi"
+  disk_adapter_type = "nvme"
+
   # ISO
   iso_url          = var.iso_path
   iso_checksum     = var.iso_checksum
@@ -71,6 +75,12 @@ source "vmware-iso" "windows" {
   # Shutdown
   shutdown_command  = "shutdown /s /t 30 /f"
   shutdown_timeout  = "10m"
+
+  # VMware settings for Win11 (TPM + Secure Boot bypass)
+  vmx_data = {
+    "vtpm.present"       = "TRUE"
+    "firmware"           = "efi"
+  }
 }
 
 build {
