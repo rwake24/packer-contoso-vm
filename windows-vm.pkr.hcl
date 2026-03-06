@@ -80,9 +80,10 @@ source "vmware-iso" "windows" {
   boot_wait    = "3s"
   boot_command = ["<spacebar>"]
 
-  # VMware settings
+  # VMware settings — boot order: disk first, then cdrom (prevents second "press any key" loop)
   vmx_data = {
-    "firmware" = "efi"
+    "firmware"      = "efi"
+    "bios.bootOrder" = "hdd,cdrom,floppy"
   }
 }
 
