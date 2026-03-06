@@ -24,17 +24,6 @@ variable "vm_name" {
   default = "ContosoUniversity-Dev"
 }
 
-variable "username" {
-  type    = string
-  default = "developer"
-}
-
-variable "password" {
-  type    = string
-  default = "P@ssw0rd123!"
-  sensitive = true
-}
-
 source "vmware-iso" "windows" {
   vm_name          = var.vm_name
   guest_os_type    = "windows9-64"
@@ -61,60 +50,21 @@ source "vmware-iso" "windows" {
     "scripts/install-software.ps1"
   ]
 
-  # WinRM
-  communicator     = "winrm"
-  winrm_username   = var.username
-  winrm_password   = var.password
-  winrm_timeout    = "90m"
-  winrm_use_ssl    = false
+  # No WinRM — provision manually after Windows installs
+  communicator = "none"
 
   # Network
   network              = "bridged"
   network_adapter_type = "e1000e"
 
-  # Boot — catch first "Press any key to boot from CD/DVD"
-  # Second reboot will timeout and boot from NVMe automatically
+  # Boot — catch "Press any key to boot from CD/DVD"
   boot_wait    = "3s"
   boot_command = ["<spacebar>"]
 
-  # Shutdown
-  shutdown_command  = "shutdown /s /t 30 /f"
-  shutdown_timeout  = "10m"
+  # Keep VM running after build
+  shutdown_timeout = "60m"
 }
 
 build {
   sources = ["source.vmware-iso.windows"]
-
-  provisioner "powershell" {
-    inline = ["Write-Host 'Connected to VM via WinRM'"]
-  }
-
-  provisioner "powershell" {
-    inline = [
-      "Write-Host 'Enabling MSMQ...'",
-      "Enable-WindowsOptionalFeature -Online -FeatureName MSMQ-Server -All -NoRestart",
-      "Write-Host 'MSMQ enabled.'"
-    ]
-  }
-
-  provisioner "powershell" {
-    script = "scripts/install-software.ps1"
-  }
-
-  provisioner "powershell" {
-    inline = [
-      "Write-Host 'Cloning ContosoUniversity repo...'",
-      "cd C:\\Projects",
-      "git clone https://github.com/Azure-Samples/dotnet-migration-copilot-samples.git",
-      "Write-Host 'Done. Project at C:\\Projects\\dotnet-migration-copilot-samples\\ContosoUniversity'"
-    ]
-  }
-
-  provisioner "powershell" {
-    inline = [
-      "Write-Host 'Cleaning up...'",
-      "Cleanmgr /sagerun:1",
-      "Write-Host 'Build complete! VM ready for .NET migration work.'"
-    ]
-  }
 }
