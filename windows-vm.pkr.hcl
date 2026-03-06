@@ -76,9 +76,9 @@ source "vmware-iso" "windows" {
   shutdown_command  = "shutdown /s /t 30 /f"
   shutdown_timeout  = "10m"
 
-  # Boot command — select SATA CDROM, then press key for "Press any key to boot from CD/DVD"
-  boot_wait    = "5s"
-  boot_command = ["<down><down><enter><wait5s><spacebar>"]
+  # Boot — press spacebar immediately to catch "Press any key to boot from CD/DVD"
+  boot_wait    = "3s"
+  boot_command = ["<spacebar>"]
 
   # VMware settings
   vmx_data = {
