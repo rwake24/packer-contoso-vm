@@ -64,7 +64,8 @@ source "vmware-iso" "windows" {
   winrm_timeout    = "60m"
   winrm_use_ssl    = false
 
-  # Network
+  # Network — Bridged so it gets a LAN IP and can use host VPN
+  network           = "bridged"
   network_adapter_type = "e1000e"
 
   # Shutdown
