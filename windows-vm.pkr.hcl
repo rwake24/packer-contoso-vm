@@ -46,9 +46,8 @@ source "vmware-iso" "windows" {
   disk_size        = 61440            # 60 GB
   disk_type_id     = "0"              # Growable virtual disk
 
-  # UEFI firmware (required for Win11)
-  firmware         = "efi"
-  disk_adapter_type = "nvme"
+  # BIOS firmware (simpler boot — LabConfig bypasses Win11 checks)
+  disk_adapter_type = "lsisas1068"
 
   # ISO
   iso_url          = var.iso_path
@@ -75,16 +74,6 @@ source "vmware-iso" "windows" {
   # Shutdown
   shutdown_command  = "shutdown /s /t 30 /f"
   shutdown_timeout  = "10m"
-
-  # Boot — press spacebar immediately to catch "Press any key to boot from CD/DVD"
-  boot_wait    = "3s"
-  boot_command = ["<spacebar>"]
-
-  # VMware settings — boot order: disk first, then cdrom (prevents second "press any key" loop)
-  vmx_data = {
-    "firmware"      = "efi"
-    "bios.bootOrder" = "hdd,cdrom,floppy"
-  }
 }
 
 build {
