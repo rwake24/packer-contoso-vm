@@ -10,7 +10,7 @@ packer {
 variable "iso_path" {
   type        = string
   default     = "C:/Users/rowake/Downloads/en-us_windows_11_business_editions_version_26h1_x64_dvd_18ddd107.iso"
-  description = "Path to Windows 10/11 ISO file"
+  description = "Path to Windows 11 ISO file"
 }
 
 variable "iso_checksum" {
@@ -37,39 +37,45 @@ variable "password" {
 
 source "vmware-iso" "windows" {
   vm_name          = var.vm_name
-  guest_os_type    = "windows9-64"    # Windows 10/11 x64
+  guest_os_type    = "windows9-64"
   headless         = false
 
   # Hardware
   cpus             = 4
   memory           = 8192
-  disk_size        = 61440            # 60 GB
-  disk_type_id     = "0"              # Growable virtual disk
+  disk_size        = 61440
+  disk_type_id     = "0"
 
-  # BIOS firmware (simpler boot — LabConfig bypasses Win11 checks)
-  disk_adapter_type = "lsisas1068"
+  # EFI + NVMe for Win11
+  firmware          = "efi"
+  disk_adapter_type = "nvme"
 
   # ISO
   iso_url          = var.iso_path
   iso_checksum     = var.iso_checksum
 
-  # Floppy with autounattend.xml for unattended install
+  # Floppy with autounattend.xml
   floppy_files = [
     "autounattend.xml",
     "scripts/setup.ps1",
     "scripts/install-software.ps1"
   ]
 
-  # WinRM connection (Packer communicates over WinRM after OS install)
+  # WinRM
   communicator     = "winrm"
   winrm_username   = var.username
   winrm_password   = var.password
-  winrm_timeout    = "60m"
+  winrm_timeout    = "90m"
   winrm_use_ssl    = false
 
-  # Network — Bridged so it gets a LAN IP and can use host VPN
-  network           = "bridged"
+  # Network
+  network              = "bridged"
   network_adapter_type = "e1000e"
+
+  # Boot — catch first "Press any key to boot from CD/DVD"
+  # Second reboot will timeout and boot from NVMe automatically
+  boot_wait    = "3s"
+  boot_command = ["<spacebar>"]
 
   # Shutdown
   shutdown_command  = "shutdown /s /t 30 /f"
@@ -79,12 +85,10 @@ source "vmware-iso" "windows" {
 build {
   sources = ["source.vmware-iso.windows"]
 
-  # Wait for WinRM to become available
   provisioner "powershell" {
     inline = ["Write-Host 'Connected to VM via WinRM'"]
   }
 
-  # Enable MSMQ
   provisioner "powershell" {
     inline = [
       "Write-Host 'Enabling MSMQ...'",
@@ -93,12 +97,10 @@ build {
     ]
   }
 
-  # Run software installation script
   provisioner "powershell" {
     script = "scripts/install-software.ps1"
   }
 
-  # Clone repo and restore packages
   provisioner "powershell" {
     inline = [
       "Write-Host 'Cloning ContosoUniversity repo...'",
@@ -108,7 +110,6 @@ build {
     ]
   }
 
-  # Take a snapshot-ready clean state
   provisioner "powershell" {
     inline = [
       "Write-Host 'Cleaning up...'",

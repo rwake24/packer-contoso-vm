@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<unattend xmlns="urn:schemas-microsoft-com:unattend">
+<unattend xmlns="urn:schemas-microsoft-com:unattend" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
 
-  <!-- Windows PE - Disk & Install -->
   <settings pass="windowsPE">
     <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <SetupUILanguage>
@@ -37,6 +36,16 @@
           <CreatePartitions>
             <CreatePartition wcm:action="add">
               <Order>1</Order>
+              <Size>300</Size>
+              <Type>EFI</Type>
+            </CreatePartition>
+            <CreatePartition wcm:action="add">
+              <Order>2</Order>
+              <Size>128</Size>
+              <Type>MSR</Type>
+            </CreatePartition>
+            <CreatePartition wcm:action="add">
+              <Order>3</Order>
               <Extend>true</Extend>
               <Type>Primary</Type>
             </CreatePartition>
@@ -45,9 +54,19 @@
             <ModifyPartition wcm:action="add">
               <Order>1</Order>
               <PartitionID>1</PartitionID>
+              <Format>FAT32</Format>
+              <Label>System</Label>
+            </ModifyPartition>
+            <ModifyPartition wcm:action="add">
+              <Order>2</Order>
+              <PartitionID>2</PartitionID>
+            </ModifyPartition>
+            <ModifyPartition wcm:action="add">
+              <Order>3</Order>
+              <PartitionID>3</PartitionID>
               <Format>NTFS</Format>
               <Label>Windows</Label>
-              <Active>true</Active>
+              <Letter>C</Letter>
             </ModifyPartition>
           </ModifyPartitions>
         </Disk>
@@ -63,7 +82,7 @@
           </InstallFrom>
           <InstallTo>
             <DiskID>0</DiskID>
-            <PartitionID>1</PartitionID>
+            <PartitionID>3</PartitionID>
           </InstallTo>
         </OSImage>
       </ImageInstall>
@@ -77,14 +96,12 @@
     </component>
   </settings>
 
-  <!-- Specialize -->
   <settings pass="specialize">
     <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <ComputerName>CONTOSO-DEV</ComputerName>
       <TimeZone>Central Standard Time</TimeZone>
     </component>
 
-    <!-- Enable WinRM for Packer -->
     <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <RunSynchronous>
         <RunSynchronousCommand wcm:action="add">
@@ -103,7 +120,6 @@
     </component>
   </settings>
 
-  <!-- OOBE - Skip all prompts -->
   <settings pass="oobeSystem">
     <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <OOBE>
