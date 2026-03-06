@@ -76,6 +76,10 @@ source "vmware-iso" "windows" {
   shutdown_command  = "shutdown /s /t 30 /f"
   shutdown_timeout  = "10m"
 
+  # Boot command — select CD/DVD from EFI boot menu
+  boot_wait    = "3s"
+  boot_command = ["<down><enter>"]
+
   # VMware settings
   vmx_data = {
     "firmware" = "efi"
