@@ -76,8 +76,8 @@ source "vmware-iso" "windows" {
   shutdown_command  = "shutdown /s /t 30 /f"
   shutdown_timeout  = "10m"
 
-  # Boot command — select CD/DVD from EFI boot menu (3rd entry)
-  boot_wait    = "3s"
+  # Boot command — select SATA CDROM (2nd entry after "Boot normally")
+  boot_wait    = "5s"
   boot_command = ["<down><down><enter>"]
 
   # VMware settings
