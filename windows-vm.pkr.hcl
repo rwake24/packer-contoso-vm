@@ -76,10 +76,9 @@ source "vmware-iso" "windows" {
   shutdown_command  = "shutdown /s /t 30 /f"
   shutdown_timeout  = "10m"
 
-  # VMware settings for Win11 (TPM + Secure Boot bypass)
+  # VMware settings
   vmx_data = {
-    "vtpm.present"       = "TRUE"
-    "firmware"           = "efi"
+    "firmware" = "efi"
   }
 }
 
