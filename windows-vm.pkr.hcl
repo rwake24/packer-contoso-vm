@@ -64,15 +64,12 @@ source "vmware-iso" "windows" {
   winrm_timeout    = "60m"
   winrm_use_ssl    = false
 
+  # Network
+  network_adapter_type = "e1000e"
+
   # Shutdown
   shutdown_command  = "shutdown /s /t 30 /f"
   shutdown_timeout  = "10m"
-
-  # VMware settings
-  vmx_data = {
-    "virtualHW.version" = "21"
-    "ethernet0.virtualDev" = "e1000e"
-  }
 }
 
 build {
