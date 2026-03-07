@@ -53,8 +53,8 @@ source "vmware-iso" "windows" {
   # No WinRM — provision manually after Windows installs
   communicator = "none"
 
-  # Network
-  network              = "bridged"
+  # Network — NAT (bridged causes issues with Firewalla not recognizing VMware MACs)
+  network              = "nat"
   network_adapter_type = "e1000e"
 
   # Boot — catch "Press any key to boot from CD/DVD"

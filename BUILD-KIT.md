@@ -4,7 +4,7 @@
 Windows 11 VM for the ContosoUniversity .NET Framework → .NET 8 migration demo + Azure Arc.
 
 **Repo:** https://github.com/rwake24/packer-contoso-vm
-**VM Specs:** 4 vCPU, 8 GB RAM, 60 GB disk (thin), Win11 Enterprise 26H1, EFI/NVMe, Bridged network
+**VM Specs:** 4 vCPU, 8 GB RAM, 60 GB disk (thin), Win11 Enterprise 26H1, EFI/NVMe, NAT network
 
 ---
 
@@ -34,7 +34,7 @@ Packer creates the VM and installs Windows unattended (~15 min). Note: `communic
 2. ISO: `C:\Users\rowake\Downloads\en-us_windows_11_business_editions_version_26h1_x64_dvd_18ddd107.iso`
 3. Guest OS: Windows 11 x64, EFI firmware
 4. 4 CPUs, 8192 MB RAM, NVMe 60 GB thin
-5. Network: Bridged
+5. Network: **NAT** (Bridged causes `6.6.0.x` ICMP blocks from Firewalla not recognizing VMware MACs)
 6. Install → pick **Windows 11 Enterprise**
 
 ---
